@@ -37,7 +37,7 @@ def test_labels():
     label = utilities.plotting_labels(var)
     assert label == 'Temperature'
     unit=utilities.plotting_units(ds, var)
-    assert unit == "°C"
+    assert unit == 'Celsius'
     colormap = utilities.plotting_colormap(var)
     assert colormap == cmo.thermal
 
