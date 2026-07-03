@@ -142,5 +142,5 @@ def test_plot_CR():
 
 def test_plot_section():
     ds = fetchers.load_sample_dataset()
-    mld = tools.compute_mld(ds,variable = 'DENSITY', use_bins = True)
-    plots.plot_section(ds,mld_df=mld)
+    plots.plot_section(ds,var='TEMP', start=475, end=500, method='pcolormesh')
+    plots.plot_section(ds,var='PSAL', start=None, end=475, method='contourf')
