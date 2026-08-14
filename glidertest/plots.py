@@ -260,12 +260,19 @@ def process_optics_assess(ds, var='CHLA'):
         print(f'Negative data in present from {str(start.values)[:16]} to {str(end.values)[:16]}')
         print(f'Negative data is present between {"%.1f" % np.round(min_z, 1)} and {"%.1f" % np.round(max_z, 1)} ')
     else:
-        print(f'There is no negative scaled {var} data, recalibration and further checks are still recommended ')
+        print(f'There is no negative scaled {var} data, recalibration and further checks are still recommended.')
     # Check if there is any missing data throughout the mission
-    if len(ds.TIME) != len(ds[var].dropna(dim='N_MEASUREMENTS').TIME):
-        print(f'{var} data is missing for part of the mission')  # Add to specify where the gaps are
+    try:
+        var_time = ds[var].dropna(dim="N_MEASUREMENTS").TIME
+    except AttributeError:
+        #   Alternative method when working with OG1
+        var_time = ds["TIME"].where(ds[var].notnull(), drop=True)
+
+    if len(ds.TIME) != len(var_time):
+        print(f"{var} data is missing for part of the mission")
     else:
-        print(f'{var} data is present for the entire mission duration')
+        print(f"{var} data is present for the entire mission duration")
+    
     # Check bottom dark count and any drift there
     bottom_opt_data = ds[var].where(ds[var].DEPTH > ds.DEPTH.max() - (ds.DEPTH.max() * 0.1)).dropna(
         dim='N_MEASUREMENTS')
