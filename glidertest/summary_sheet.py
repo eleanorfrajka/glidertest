@@ -360,7 +360,7 @@ def create_docfile(ds, path):
     return doc
 
 
-def optics_avaialble_data(ds):
+def optics_available_data(ds):
     """
     Identify available bio-optical sensors and their variables in the dataset.
 
@@ -448,7 +448,7 @@ def optics_negative_check(ds):
     -----
     Original Author: Chiara  Monforte.
     """
-    available_sensor, available_optics, vars_optics = optics_avaialble_data(ds)
+    available_sensor, available_optics, vars_optics = optics_available_data(ds)
     neg_perc = []
     for var in vars_optics:
         neg_val = len(ds[var].where(ds[var] < 0).dropna(dim='N_MEASUREMENTS'))
@@ -477,7 +477,7 @@ def optics_negative_string(ds):
     -----
     Original Author: Chiara  Monforte.
     """
-    available_sensor, available_optics, vars_optics = optics_avaialble_data(ds)
+    available_sensor, available_optics, vars_optics = optics_available_data(ds)
     neg_check = optics_negative_check(ds)
 
     parts = [f"{var} has {neg:.1f}% negative data" for var, neg in zip(vars_optics, neg_check)]
@@ -514,7 +514,7 @@ def create_hyst_plots(ds, path):
     -----
     Original Author: Chiara  Monforte.
     """
-    available_sensor, available_optics, vars_optics = optics_avaialble_data(ds)
+    available_sensor, available_optics, vars_optics = optics_available_data(ds)
     for var in vars_optics:
         df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, var=var, v_res=1)
         fig, ax = plots.plot_hysteresis(ds, var=var)
@@ -546,7 +546,7 @@ def create_drift_plots(ds, path):
     -----
     Original Author: Chiara  Monforte.
     """
-    available_sensor, available_optics, vars_optics = optics_avaialble_data(ds)
+    available_sensor, available_optics, vars_optics = optics_available_data(ds)
     for var in vars_optics:
         fig, ax = plots.process_optics_assess(ds, var=var)
         fig_name = f'{var}_drift.png'
@@ -584,7 +584,7 @@ def create_optics_doc(ds, path):
         doc.title('Mission summary - Bio optical sensors')
         doc.newline()
         doc.h1('Available variables and sensor info')
-        available_sensor, available_optics, vars_optics = optics_avaialble_data(ds)
+        available_sensor, available_optics, vars_optics = optics_available_data(ds)
         doc.newline()
         doc.content(f'The following variables are available in this dataset: {str(available_optics)[1:-1]}')
         doc.newline()
@@ -705,7 +705,7 @@ def mission_report(ds, report_folder_path, type='General'):
         create_docfile(ds, report_dir)
         rst_to_md(Path(report_dir), 'summary')
     if type=='Optics':
-        available_sensor, _, _ = optics_avaialble_data(ds)
+        available_sensor, _, _ = optics_available_data(ds)
         if available_sensor:
             fig_quench, ax_quench = plt.subplots(1, 2, figsize=(15, 5), gridspec_kw={'width_ratios': [3, 2]})
             plots.plot_quench_assess(ds, 'CHLA', ax=ax_quench[0], ylim=35);
