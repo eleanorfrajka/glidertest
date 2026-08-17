@@ -1,4 +1,3 @@
-netcdf4
 pooch
 sgp4>=2.14
 xarray
@@ -23,3 +22,5 @@ folium
 Ipython
 ipywidgets
 pypandoc
+h5netcdf
+h5py
