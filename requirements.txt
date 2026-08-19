@@ -1,6 +1,7 @@
 pooch
 xarray
 numpy
+cmocean
 matplotlib
 pandas  
 seaborn 
