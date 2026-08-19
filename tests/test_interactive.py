@@ -13,4 +13,3 @@ def test_interactive_profiles():
     interactive.ts_plot(ds)
     interactive.daynight_avg(ds)
     interactive.up_down_bias(ds)
-    

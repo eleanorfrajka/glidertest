@@ -1,7 +1,7 @@
-netcdf4
 pooch
 xarray
 numpy
+cmocean
 matplotlib
 pandas  
 seaborn 
@@ -17,3 +17,5 @@ Ipython
 ipywidgets
 pypandoc
 rstcloth
+h5netcdf
+h5py
