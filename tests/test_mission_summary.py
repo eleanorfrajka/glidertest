@@ -36,6 +36,6 @@ def test_docs():
 
 def test_optics_func():
     ds = fetchers.load_sample_dataset()
-    summary_sheet.optics_avaialble_data(ds)
+    summary_sheet.optics_available_data(ds)
     summary_sheet.optics_negative_check(ds)
     summary_sheet.optics_negative_string(ds)
