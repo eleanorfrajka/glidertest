@@ -6,29 +6,45 @@
 Welcome to glidertest's documentation!
 ======================================
 
-Glidertest is a Python package aiming to diagnose possible issues with your glider dataset. The package takes as input data from any glider in `OG1 format <https://github.com/OceanGlidersCommunity/OG-format-user-manual>`_.
-At the moment, we have implemented functions ranging from basic visualization of your glider data (location, gridding in the dataset, water mass properties, water column structure, etc.) to more complex analysis such as flight model performance when you work with vertical velocities or non-photochemical quenching when you work with optical data. 
-This package serves solely as a diagnostic tool. We occasionally have suggestions for packages or tools that aim to address and solve a particular issue or link to SOP where more processing info can be found.
+Glidertest is a Python package aiming to diagnose possible issues in a glider dataset. The package takes as input data from any glider in `OG1 format <https://github.com/OceanGlidersCommunity/OG-format-user-manual>`_. 
 
-We recommend consulting best practice guides like the `Oxygen SOP <https://oceangliderscommunity.github.io/Oxygen_SOP/README.html>`_ and the other OceanGliders SOPs. We also recommend the `GliderTools <https://glidertools.readthedocs.io/en/latest/>`_ Python package for processing and to possibly address some common issues with glider data.
+Glidertest has 3 main components:
 
-We use work from the following papers:
-    * Bennett, J., Stahr, F., and Eriksen, C. (2019). Determining Seaglider Velocities Automatically. http://hdl.handle.net/1773/44948
-    * Frajka-Williams, E., Eriksen, C. C., Rhines, P. B., and Harcourt, R. R. (2011). Determining vertical water velocities from Seaglider. Journal of Atmospheric and Oceanic Technology, 28(12), 1641-1656. https://doi.org/10.1175/2011JTECHO830.1
-    * Thomalla, S.J., Moutier, W., Ryan-Keogh, T.J., Gregor, L. and Schütt, J. (2018), An optimized method for correcting fluorescence quenching using optical backscattering on autonomous platforms. Limnol. Oceanogr. Methods, 16: 132-144. https://doi.org/10.1002/lom3.10234
- 
-We provide an example notebook to demonstrate the purpose of the various function and test datasets from SeaExplorer data in the Baltic and Seaglider data in the Labrador Sea.
+1. **Tools to diagnose** (see :doc:`glidertest`) issues in your glider data, e.g. data spikes, drift, formatting issues; as well as non-photochecmical quenching and issues with the glider flight model.
+
+2. **Interactive plotting** capability (see :mod:`glidertest.interactive`), enabling a quick browse through data profiles and the ability to zoom in on specific regions of interest.
+
+3. **Summary sheets** (development underway) to produce a summary of an individual glider mission, including basic diagnostics, plots and tables of potential issues.  This provides a way for glider operators to quickly assess the quality of their data and identify potential issues for further investigation.
+
+This package serves solely as a diagnostic tool. It does not provide algorithms to correct potential problems.  It may offer suggestions for where to look for more information on potential issues, e.g. available standard operating procedures (SOPs) or python packages.  In general, we recommend consulting best practice guides like the `Oxygen SOP <https://oceangliderscommunity.github.io/Oxygen_SOP/README.html>`_ and the other OceanGliders SOPs. We also recommend the `GliderTools <https://glidertools.readthedocs.io/en/latest/>`_ Python package for processing and for tools to address some common issues with glider data.
+
+See the **Users Guide** for an example notebook (also in `glidertest/notebooks/demo.ipynb`) to see how to use the various functions with some provided sample data.   Sample data are available from SeaExplorer vehicles in the Baltic and Seagliders in the Labrador Sea.
 
 For recommendations or bug reports, please visit https://github.com/OceanGlidersCommunity/glidertest/issues/new
+
+
 
 ======================================
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
+   :caption: Getting started
+
+   installation
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Users guide
 
    demo-output.ipynb
-   glidertest
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Help and reference
+
+   glidertest 
+   GitHub Repo <http://github.com/OceanGlidersCommunity/glidertest>
+   references
 
 
 Indices and tables
