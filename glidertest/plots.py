@@ -317,7 +317,7 @@ def process_optics_assess(ds, var='CHLA'):
             data=ds,
             x=np.arange(0, len(bottom_opt_data)),
             y=bottom_opt_data,
-            scatter_kws={"color": "grey"},
+            scatter_kws={"color": "grey", "s": 10},
             line_kws={"color": "red", "label": f"y={slope:.8f} x+{intercept:.5f}"},
             ax=ax
         )
@@ -526,14 +526,14 @@ def check_temporal_drift(ds: xr.Dataset, var: str, ax: plt.Axes = None, **kw: di
             fig = plt.gcf()
             force_plot = False
 
-        ax[0].scatter(mdates.date2num(ds.TIME), ds[var], s=10)
+        ax[0].scatter(mdates.date2num(ds.TIME), ds[var], s=3)
         # Set x-tick labels based on duration of the selection
         utilities._time_axis_formatter(ax[0], ds, format_x_axis=True)
 
         ax[0].set(ylim=(np.nanpercentile(ds[var], 0.01), np.nanpercentile(ds[var], 99.99)),
                   ylabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})')
 
-        c = ax[1].scatter(ds[var], ds.DEPTH, c=mdates.date2num(ds.TIME), s=10)
+        c = ax[1].scatter(ds[var], ds.DEPTH, c=mdates.date2num(ds.TIME), s=3)
         ax[1].set(xlim=(np.nanpercentile(ds[var], 0.01), np.nanpercentile(ds[var], 99.99)), ylabel='Depth (m)',
                   xlabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})')
         ax[1].invert_yaxis()
@@ -701,6 +701,7 @@ def plot_glider_track(ds: xr.Dataset, ax: plt.Axes = None, **kw: dict) -> tuple(
             longitudes,
             latitudes,
             c=numeric_times,
+            s=5,
             cmap='viridis',
             vmin=vmin,
             vmax=vmax,
