@@ -13,7 +13,7 @@ year = datetime.datetime.now(tz=datetime.timezone.utc).date().year
 
 # General information about the project.
 project = 'glidertest'
-author = 'Eleanor Frajka-Williams, Chiara Monforte, Callum Rollo'
+author = 'Eleanor Frajka-Williams, Chiara Monforte, Callum Rollo, Till Moritz'
 copyright = f"{year}, {author}"
 release = __version__
 
