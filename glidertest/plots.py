@@ -1977,7 +1977,6 @@ def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res
 
             ax_i.invert_yaxis()
             ax_i.set_ylabel("Depth (m)")
-            ax_i.set_title(f"Section plot of {label}")
             ax_i.grid(True)
 
             # colorbar
