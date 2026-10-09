@@ -201,7 +201,7 @@ def daynight_avg(ds):
     """
 
     def plot_daynight_avg(var, sel_day):
-        fig, ax = plots.plot_daynight_avg(ds, var = var, sel_day = f'{sel_day}')
+        fig, ax = plots.plot_daynight_avg(ds, variable= var, sel_day =f'{sel_day}')
         display(fig)
         plt.close(fig)
         del fig, ax

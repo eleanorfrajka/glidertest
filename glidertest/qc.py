@@ -210,12 +210,12 @@ def qc_checks(ds, var='TEMP'):
     Original Author: Chiara  Monforte
     """
     utilities._check_necessary_variables(ds, [var, 'TIME'])
-    gr = tools.compute_global_range(ds, var=var, min_val=configs[var]['gross_range_test']['suspect_span'][0],
+    gr = tools.compute_global_range(ds, variable=var, min_val=configs[var]['gross_range_test']['suspect_span'][0],
                                     max_val=configs[var]['gross_range_test']['suspect_span'][1])
     spike = qartod.spike_test(ds[var], suspect_threshold=configs[var]['spike_test']['suspect_threshold'],
                               fail_threshold=configs[var]['spike_test']['fail_threshold'], method="average")
     flat = qartod.flat_line_test(ds[var], ds.TIME, 1, 3, 0.001)
-    __, __, err_mean, err_range, __ = tools.compute_hyst_stat(ds, var=var, v_res=1)
+    __, __, err_mean, err_range, __ = tools.compute_hyst_stat(ds, variable=var, v_res=1)
 
     return gr, spike, flat, err_mean, err_range
 

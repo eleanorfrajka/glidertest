@@ -58,7 +58,7 @@ def _show():
         plt.show()
 
 
-def plot_updown_bias(ds: xr.Dataset, var='TEMP', v_res=1, ax: plt.Axes = None, **kw: dict, ) -> tuple(
+def plot_updown_bias(ds: xr.Dataset, variable='TEMP', v_res=1, ax: plt.Axes = None, **kw: dict, ) -> tuple(
     {plt.Figure, plt.Axes}):
     """
     This function can be used to plot the up and downcast differences computed with the updown_bias function
@@ -68,7 +68,7 @@ def plot_updown_bias(ds: xr.Dataset, var='TEMP', v_res=1, ax: plt.Axes = None, *
     ds: xarray.Dataset
         Dataset in **OG1 format**, containing at least **TIME, DEPTH, LATITUDE, LONGITUDE,** and the selected variable.
         Data should not be gridded.
-    var: str, optional, default='TEMP'
+    variable: str, optional, default='TEMP'
         Selected variable
     v_res: float, default = 1
         Vertical resolution for the gridding
@@ -96,9 +96,9 @@ def plot_updown_bias(ds: xr.Dataset, var='TEMP', v_res=1, ax: plt.Axes = None, *
             fig = plt.gcf()
             force_plot = False
 
-        df = tools.quant_updown_bias(ds, var=var, v_res=v_res)
+        df = tools.quant_updown_bias(ds, variable=variable, v_res=v_res)
         if not all(hasattr(df, attr) for attr in ['dc', 'depth']):
-            ax.text(0.5, 0.55, ds[var].standard_name, va='center', ha='center', transform=ax.transAxes,
+            ax.text(0.5, 0.55, ds[variable].standard_name, va='center', ha='center', transform=ax.transAxes,
                     bbox=dict(facecolor='white', alpha=0.5, edgecolor='none'))
             ax.text(0.5, 0.45, 'data unavailable', va='center', ha='center', transform=ax.transAxes,
                     bbox=dict(facecolor='white', alpha=0.5, edgecolor='none'))
@@ -109,7 +109,7 @@ def plot_updown_bias(ds: xr.Dataset, var='TEMP', v_res=1, ax: plt.Axes = None, *
             lims = np.abs(df.dc)
             ax.set_xlim(-np.nanpercentile(lims, 99.5), np.nanpercentile(lims, 99.5))
             ax.set_ylim(df.depth.max() + 1, -df.depth.max() / 30)
-        ax.set_xlabel(f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})')
+        ax.set_xlabel(f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})')
         ax.set_ylabel(f'Depth (m)')
         ax.grid()
         if force_plot:
@@ -247,7 +247,7 @@ def plot_basic_vars(ds: xr.Dataset, v_res=1, start_prof=0, end_prof=-1, ax=None)
     return fig, ax
 
 
-def process_optics_assess(ds, var='CHLA'):
+def process_optics_assess(ds, variable='CHLA'):
     """
     Function to assess visually any drift in deep optics data and the presence of any possible negative data. This function returns  both plots and text
 
@@ -255,7 +255,7 @@ def process_optics_assess(ds, var='CHLA'):
     ----------
     ds: xarray.Dataset
         Dataset in **OG1 format**, containing at least **TIME, DEPTH,** and the selected variable.
-    var: str, optional, default='CHLA'
+    variable: str, optional, default='CHLA'
         Selected variable
 
     Returns
@@ -278,34 +278,34 @@ def process_optics_assess(ds, var='CHLA'):
     -----
     Original Author: Chiara Monforte
     """
-    utilities._check_necessary_variables(ds, [var, 'TIME', 'DEPTH'])
+    utilities._check_necessary_variables(ds, [variable, 'TIME', 'DEPTH'])
     # Check how much negative data there is
-    neg_chl = np.round((len(np.where(ds[var] < 0)[0]) * 100) / len(ds[var]), 1)
+    neg_chl = np.round((len(np.where(ds[variable] < 0)[0]) * 100) / len(ds[variable]), 1)
     if neg_chl > 0:
-        _log.info(f'{neg_chl}% of scaled {var} data is negative, consider recalibrating data')
+        _log.info(f'{neg_chl}% of scaled {variable} data is negative, consider recalibrating data')
         # Check where the negative values occur and if we just see them at specific time of the mission or not
-        start = ds.TIME[np.where(ds[var] < 0)][0]
-        end = ds.TIME[np.where(ds[var] < 0)][-1]
-        min_z = ds.DEPTH[np.where(ds[var] < 0)].min().values
-        max_z = ds.DEPTH[np.where(ds[var] < 0)].max().values
+        start = ds.TIME[np.where(ds[variable] < 0)][0]
+        end = ds.TIME[np.where(ds[variable] < 0)][-1]
+        min_z = ds.DEPTH[np.where(ds[variable] < 0)].min().values
+        max_z = ds.DEPTH[np.where(ds[variable] < 0)].max().values
         _log.info(f'Negative data in present from {str(start.values)[:16]} to {str(end.values)[:16]}')
         _log.info(f'Negative data is present between {"%.1f" % np.round(min_z, 1)} and {"%.1f" % np.round(max_z, 1)} ')
     else:
-        _log.info(f'There is no negative scaled {var} data, recalibration and further checks are still recommended.')
+        _log.info(f'There is no negative scaled {variable} data, recalibration and further checks are still recommended.')
     # Check if there is any missing data throughout the mission
     try:
-        var_time = ds[var].dropna(dim="N_MEASUREMENTS").TIME
+        var_time = ds[variable].dropna(dim="N_MEASUREMENTS").TIME
     except AttributeError:
         #   Alternative method when working with OG1
-        var_time = ds["TIME"].where(ds[var].notnull(), drop=True)
+        var_time = ds["TIME"].where(ds[variable].notnull(), drop=True)
 
     if len(ds.TIME) != len(var_time):
-        _log.info(f"{var} data is missing for part of the mission")
+        _log.info(f"{variable} data is missing for part of the mission")
     else:
-        _log.info(f"{var} data is present for the entire mission duration")
+        _log.info(f"{variable} data is present for the entire mission duration")
 
     # Check bottom dark count and any drift there
-    bottom_opt_data = ds[var].where(ds[var].DEPTH > ds.DEPTH.max() - (ds.DEPTH.max() * 0.1)).dropna(
+    bottom_opt_data = ds[variable].where(ds[variable].DEPTH > ds.DEPTH.max() - (ds.DEPTH.max() * 0.1)).dropna(
         dim='N_MEASUREMENTS')
     slope, intercept, r_value, p_value, std_err = stats.linregress(np.arange(0, len(bottom_opt_data)), bottom_opt_data)
 
@@ -327,7 +327,7 @@ def process_optics_assess(ds, var='CHLA'):
         ax.set(
             ylim=(np.nanpercentile(bottom_opt_data, 0.5), np.nanpercentile(bottom_opt_data, 99.5)),
             xlabel='Measurements',
-            ylabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})'
+            ylabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})'
         )
         _show()
     percentage_change = (((slope * len(bottom_opt_data) + intercept) - intercept) / abs(intercept)) * 100
@@ -339,11 +339,11 @@ def process_optics_assess(ds, var='CHLA'):
             f'Data changed (increased or decreased) by {"%.1f" % np.round(percentage_change, 1)}% from the beginning to the end of the mission')
     else:
         _log.info(
-            f'Data from the deepest 10% of data has been analysed and data seems stable. These deep values can be used to re-assess the dark count if the no {var} at depth assumption is valid in this site and this depth')
+            f'Data from the deepest 10% of data has been analysed and data seems stable. These deep values can be used to re-assess the dark count if the no {variable} at depth assumption is valid in this site and this depth')
     return fig, ax
 
 
-def plot_daynight_avg(ds, var='PSAL', ax: plt.Axes = None, sel_day=None, **kw: dict, ) -> tuple({plt.Figure, plt.Axes}):
+def plot_daynight_avg(ds, variable='PSAL', ax: plt.Axes = None, sel_day=None, **kw: dict, ) -> tuple({plt.Figure, plt.Axes}):
     """
     This function can be used to plot the day and night averages computed with the day_night_avg function
 
@@ -351,7 +351,7 @@ def plot_daynight_avg(ds, var='PSAL', ax: plt.Axes = None, sel_day=None, **kw: d
     ----------
     ds: xarray.Dataset
         Dataset in **OG1 format**, containing at least **TIME, DEPTH,** and the selected variable.
-    var: str, optional, default='PSAL'
+    variable: str, optional, default='PSAL'
         Selected variable
     ax: matplotlib.axes.Axes, default = None
         Axis to plot the data
@@ -370,7 +370,7 @@ def plot_daynight_avg(ds, var='PSAL', ax: plt.Axes = None, sel_day=None, **kw: d
     Original Author: Chiara Monforte
 
     """
-    day, night = tools.compute_daynight_avg(ds, sel_var=var, start_time=sel_day, end_time=sel_day)
+    day, night = tools.compute_daynight_avg(ds, variable=variable, start_time=sel_day, end_time=sel_day)
     if not sel_day:
         dates = list(day.date.dropna().values) + list(night.date.dropna().values)
         dates.sort()
@@ -390,14 +390,14 @@ def plot_daynight_avg(ds, var='PSAL', ax: plt.Axes = None, sel_day=None, **kw: d
         ax.legend()
         ax.invert_yaxis()
         ax.grid()
-        ax.set(xlabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})', ylabel='Depth (m)')
+        ax.set(xlabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})', ylabel='Depth (m)')
         ax.set_title(sel_day)
         if force_plot:
             _show()
     return fig, ax
 
 
-def plot_quench_assess(ds: xr.Dataset, sel_var: str, ax: plt.Axes = None, start_time=None,
+def plot_quench_assess(ds: xr.Dataset, variable: str, ax: plt.Axes = None, start_time=None,
                        end_time=None, start_prof=None, end_prof=None, ylim=35, **kw: dict, ) -> tuple(
     {plt.Figure, plt.Axes}):
     """
@@ -409,7 +409,7 @@ def plot_quench_assess(ds: xr.Dataset, sel_var: str, ax: plt.Axes = None, start_
     ds : xarray.Dataset
         Dataset in **OG1 format**, containing at least **TIME, DEPTH, LATITUDE, LONGITUDE**, and the selected variable.
         Data **should not** be gridded.
-    sel_var : str
+    variable : str
         The selected variable to plot.
     ax : matplotlib.axes.Axes, optional, default = `None`
         Axis on which to plot the data. If `None`, a new figure and axis will be created.
@@ -437,7 +437,7 @@ def plot_quench_assess(ds: xr.Dataset, sel_var: str, ax: plt.Axes = None, start_
     -----
     Original Author: Chiara Monforte
     """
-    utilities._check_necessary_variables(ds, ['TIME', sel_var, 'DEPTH'])
+    utilities._check_necessary_variables(ds, ['TIME', variable, 'DEPTH'])
     with plt.style.context(_style()):
         if ax is None:
             fig, ax = plt.subplots()
@@ -466,7 +466,7 @@ def plot_quench_assess(ds: xr.Dataset, sel_var: str, ax: plt.Axes = None, start_
             raise ValueError(msg)
 
         sunrise, sunset = utilities.compute_sunset_sunrise(ds_sel.TIME, ds_sel.LATITUDE, ds_sel.LONGITUDE)
-        surf_chla = ds_sel[sel_var].where(ds_sel[sel_var].DEPTH < ylim).dropna(dim='N_MEASUREMENTS')
+        surf_chla = ds_sel[variable].where(ds_sel[variable].DEPTH < ylim).dropna(dim='N_MEASUREMENTS')
         logchla = np.log10(surf_chla.where((surf_chla > 0)).dropna(dim='N_MEASUREMENTS'))
         c = ax.scatter(logchla.TIME, logchla.DEPTH, c=logchla, s=10, vmin=np.nanpercentile(logchla, 0.5),
                        vmax=np.nanpercentile(logchla, 99.5))
@@ -483,12 +483,12 @@ def plot_quench_assess(ds: xr.Dataset, sel_var: str, ax: plt.Axes = None, start_
         # Less x axis ticks
         ax.xaxis.set_major_locator(mdates.AutoDateLocator(minticks=4, maxticks=6))
 
-        plt.colorbar(c, label=f'log₁₀({utilities.plotting_labels(sel_var)}) ({utilities.plotting_units(ds, sel_var)})')
+        plt.colorbar(c, label=f'log₁₀({utilities.plotting_labels(variable)}) ({utilities.plotting_units(ds, variable)})')
         _show()
     return fig, ax
 
 
-def check_temporal_drift(ds: xr.Dataset, var: str, ax: plt.Axes = None, **kw: dict, ) -> tuple({plt.Figure, plt.Axes}):
+def check_temporal_drift(ds: xr.Dataset, variable: str, ax: plt.Axes = None, **kw: dict, ) -> tuple({plt.Figure, plt.Axes}):
     """
     Assesses potential **temporal drift** in a selected variable by generating a figure with two subplots:
     1. **Time series scatter plot** of the variable.
@@ -499,7 +499,7 @@ def check_temporal_drift(ds: xr.Dataset, var: str, ax: plt.Axes = None, **kw: di
     ds : xarray.Dataset
         Dataset in **OG1 format**, containing at least **TIME, DEPTH,** and the selected variable.
         Data **should not be gridded**.
-    var : str, optional
+    variable : str, optional
         Selected variable to analyze.
     ax : matplotlib.axes.Axes, optional
         Axis to plot the data. If None, a new figure and axis will be created.
@@ -517,7 +517,7 @@ def check_temporal_drift(ds: xr.Dataset, var: str, ax: plt.Axes = None, **kw: di
     -----
     Original Author: Chiara Monforte
     """
-    utilities._check_necessary_variables(ds, ['TIME', var, 'DEPTH'])
+    utilities._check_necessary_variables(ds, ['TIME', variable, 'DEPTH'])
     with plt.style.context(_style()):
         if ax is None:
             fig, ax = plt.subplots(1, 2)
@@ -526,16 +526,16 @@ def check_temporal_drift(ds: xr.Dataset, var: str, ax: plt.Axes = None, **kw: di
             fig = plt.gcf()
             force_plot = False
 
-        ax[0].scatter(mdates.date2num(ds.TIME), ds[var], s=10)
+        ax[0].scatter(mdates.date2num(ds.TIME), ds[variable], s=10)
         # Set x-tick labels based on duration of the selection
         utilities._time_axis_formatter(ax[0], ds, format_x_axis=True)
 
-        ax[0].set(ylim=(np.nanpercentile(ds[var], 0.01), np.nanpercentile(ds[var], 99.99)),
-                  ylabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})')
+        ax[0].set(ylim=(np.nanpercentile(ds[variable], 0.01), np.nanpercentile(ds[variable], 99.99)),
+                  ylabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})')
 
-        c = ax[1].scatter(ds[var], ds.DEPTH, c=mdates.date2num(ds.TIME), s=10)
-        ax[1].set(xlim=(np.nanpercentile(ds[var], 0.01), np.nanpercentile(ds[var], 99.99)), ylabel='Depth (m)',
-                  xlabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})')
+        c = ax[1].scatter(ds[variable], ds.DEPTH, c=mdates.date2num(ds.TIME), s=10)
+        ax[1].set(xlim=(np.nanpercentile(ds[variable], 0.01), np.nanpercentile(ds[variable], 99.99)), ylabel='Depth (m)',
+                  xlabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})')
         ax[1].invert_yaxis()
         [a.grid() for a in ax]
 
@@ -1336,7 +1336,7 @@ def plot_combined_velocity_profiles(ds_out_dives: xr.Dataset, ds_out_climbs: xr.
         return fig, ax
 
 
-def plot_hysteresis(ds, var='DOXY', v_res=1, threshold=2, ax=None):
+def plot_hysteresis(ds, variable='DOXY', v_res=1, threshold=2, ax=None):
     """
     This function creates 4 plots which can help the user visualize any possible hysteresis
     present in their dataset for a specific variable
@@ -1346,7 +1346,7 @@ def plot_hysteresis(ds, var='DOXY', v_res=1, threshold=2, ax=None):
     ds : xarray.Dataset
         Dataset in **OG1 format** containing at least **DEPTH, PROFILE_NUMBER** and the selected variable.
         Data should **not** be gridded.
-    var : str, optional, default = 'DOXY'
+    variable : str, optional, default = 'DOXY'
         The variable to analyze for hysteresis effects
     v_res : int, default = 1
         Vertical resolution for gridding the data
@@ -1366,8 +1366,8 @@ def plot_hysteresis(ds, var='DOXY', v_res=1, threshold=2, ax=None):
     -----
     Original Author: Chiara Monforte
     """
-    varG, profG, depthG = utilities.construct_2dgrid(ds.PROFILE_NUMBER, ds.DEPTH, ds[var], 1, v_res, x_bin_center=False)
-    df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, var=var, v_res=v_res)
+    varG, profG, depthG = utilities.construct_2dgrid(ds.PROFILE_NUMBER, ds.DEPTH, ds[variable], 1, v_res, x_bin_center=False)
+    df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, variable=variable, v_res=v_res)
     with plt.style.context(_style()):
         if ax is None:
             fig = plt.figure(constrained_layout=True)
@@ -1416,8 +1416,8 @@ def plot_hysteresis(ds, var='DOXY', v_res=1, threshold=2, ax=None):
         [a.grid() for a in ax]
         [a.invert_yaxis() for a in ax]
         ax[0].set_ylabel('Depth (m)')
-        ax[0].set_xlabel(f'{utilities.plotting_labels(var)} \nmean ({utilities.plotting_units(ds, var)})', fontsize= 15)
-        ax[1].set_xlabel(f'Absolute difference \n|Δ| ({ds[var].units})', fontsize= 15)
+        ax[0].set_xlabel(f'{utilities.plotting_labels(variable)} \nmean ({utilities.plotting_units(ds, variable)})', fontsize= 15)
+        ax[1].set_xlabel(f'Absolute difference \n|Δ| ({ds[variable].units})', fontsize= 15)
         ax[2].set_xlabel('Error [|Δ| / mean] \n(%)', fontsize= 15)
         ax[3].set_xlabel('Scaled error [|Δ| / range] \n(%)', fontsize= 15)
         for ax1 in ax[:-1]:
@@ -1425,9 +1425,9 @@ def plot_hysteresis(ds, var='DOXY', v_res=1, threshold=2, ax=None):
         c = ax[4].pcolor(profG[:-1, :], depthG[:-1, :], np.diff(varG, axis=0),
                          vmin=np.nanpercentile(np.diff(varG, axis=0), 0.5),
                          vmax=np.nanpercentile(np.diff(varG, axis=0), 99.5), cmap='seismic')
-        plt.colorbar(c, ax=ax[4], label=f'Difference dive-climb \n({ds[var].units})', fraction=0.05)
+        plt.colorbar(c, ax=ax[4], label=f'Difference dive-climb \n({ds[variable].units})', fraction=0.05)
         ax[4].set(ylabel='Depth (m)', xlabel='Profile number')
-        fig.suptitle(utilities.plotting_labels(var), y=1.04)
+        fig.suptitle(utilities.plotting_labels(variable), y=1.04)
         if force_plot:
             _show()
     return fig, ax
@@ -1506,7 +1506,7 @@ def plot_outlier_duration(ds: xr.Dataset, rolling_mean: pd.Series, overtime, std
     return fig, ax
 
 
-def plot_global_range(ds, var='DOXY', min_val=-5, max_val=600, ax=None):
+def plot_global_range(ds, variable='DOXY', min_val=-5, max_val=600, ax=None):
     """
     This function creates a histogram of the selected variable (`var`) from the dataset (`ds`),
     allowing for visual inspection of its distribution. It overlays vertical lines at the specified
@@ -1517,7 +1517,7 @@ def plot_global_range(ds, var='DOXY', min_val=-5, max_val=600, ax=None):
     ----------
     ds : xarray.Dataset
         The dataset containing the variable to be plotted.
-    var : str, default = 'DOXY'
+    variable : str, default = 'DOXY'
         The name of the variable to be plotted in the histogram.
     min_val : float, default = -5
         The minimum value of the global range to highlight on the plot.
@@ -1545,10 +1545,10 @@ def plot_global_range(ds, var='DOXY', min_val=-5, max_val=600, ax=None):
             fig = plt.gcf()
             force_plot = False
 
-        ax.hist(ds[var], bins=50)
+        ax.hist(ds[variable], bins=50)
         ax.axvline(min_val, c='r')
         ax.axvline(max_val, c='r')
-        ax.set(xlabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})', ylabel='Frequency')
+        ax.set(xlabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})', ylabel='Frequency')
         ax.set_title('Global range check')
         ax.grid()
         if force_plot:
@@ -1686,7 +1686,7 @@ def plot_max_depth_per_profile(ds: xr.Dataset, bins=20, ax=None, **kw: dict) -> 
     return fig, ax
 
 
-def plot_profile(ds: xr.Dataset, profile_num: int = None, vars: list = ['TEMP', 'PSAL', 'DENSITY'],
+def plot_profile(ds: xr.Dataset, profile_num: int = None, variables: list = ['TEMP', 'PSAL', 'DENSITY'],
                  use_bins: bool = False, binning: float = 2, ax=None):
     """
     Plots the specified variables against depth for a given profile number from an OG1-format dataset.
@@ -1698,7 +1698,7 @@ def plot_profile(ds: xr.Dataset, profile_num: int = None, vars: list = ['TEMP', 
         Xarray dataset in OG1 format with at least PROFILE_NUMBER, DEPTH and the specified variables.
     profile_num: int or None
         Profile number to plot. If None, plots mean profile.
-    vars: list
+    variables: list
         Variables to plot. Default is ['TEMP','PSAL','DENSITY'].
     use_bins: bool
         Whether to bin the data vertically.
@@ -1716,8 +1716,8 @@ def plot_profile(ds: xr.Dataset, profile_num: int = None, vars: list = ['TEMP', 
     -----
     Original Author: Till Moritz
     """
-    vars = [v for v in vars if v]
-    if not vars:
+    variables = [v for v in variables if v]
+    if not variables:
         fig, ax1 = plt.subplots(figsize=(12, 9))
         ax1.set_title('No Variables Selected')
         ax1.set_ylabel('Depth (m)')
@@ -1725,7 +1725,7 @@ def plot_profile(ds: xr.Dataset, profile_num: int = None, vars: list = ['TEMP', 
         ax1.grid(True)
         return fig, ax1
 
-    if len(vars) > 3:
+    if len(variables) > 3:
         raise ValueError("Only three variables can be plotted at once, chose fewer variables")
 
     with plt.style.context(_style()):
@@ -1744,23 +1744,23 @@ def plot_profile(ds: xr.Dataset, profile_num: int = None, vars: list = ['TEMP', 
         if profile_num is not None:
             profile = ds.where(ds.PROFILE_NUMBER == profile_num, drop=True)
             if use_bins:
-                profile = utilities.bin_profile(profile, vars, binning)
+                profile = utilities.bin_profile(profile, variables, binning)
             title_str = f'Profile {profile_num}'
         else:
             # Mean profile logic
             data = {}
-            for var in vars:
-                df = tools.mean_profile(ds, var=var, v_res=binning)
+            for var in variables:
+                df = tools.mean_profile(ds, variable=var, v_res=binning)
                 data[var] = df['mean'].values
             depth = df['depth'].values
-            profile = xr.Dataset({var: (['depth'], data[var]) for var in vars})
+            profile = xr.Dataset({var: (['depth'], data[var]) for var in variables})
             profile['DEPTH'] = (['depth'], depth)
             title_str = 'Mean Profile'
 
         mission = ds.id.split('_')[1][0:8]
         glider = ds.id.split('_')[0]
 
-        for i, var in enumerate(vars):
+        for i, var in enumerate(variables):
             ax = axs[i]
             unit = utilities.plotting_units(ds, var)
             label = utilities.plotting_labels(var)
@@ -1845,7 +1845,7 @@ def plot_CR(ds: xr.Dataset, profile_num: int, use_bins: bool = False, binning: f
         _show()
     return fig, ax
 
-def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res=2, start=None, end=None, show_time_axis=True, method="pcolormesh", log_scale=False, ax=None, **kw, ):
+def plot_section(ds: xr.Dataset, variables: list = ['TEMP', 'PSAL', 'DENSITY'], v_res=2, start=None, end=None, show_time_axis=True, method="pcolormesh", log_scale=False, ax=None, **kw, ):
     """
     Plots a section of the specified variable from the dataset `ds` against depth and profile number.
 
@@ -1853,7 +1853,7 @@ def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res
     ----------
     ds: xarray.Dataset
         The dataset containing the variable to be plotted.
-    vars: str or list of str
+    variables: str or list of str
         Variable(s) to plot
     ax: matplotlib.axes.Axes, optional
         The axes on which to plot. If None, a new figure and axes will be created.
@@ -1886,8 +1886,8 @@ def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res
     Original Author: Till Moritz
     """
 
-    vars = [v for v in vars if v]
-    if not vars:
+    variables = [v for v in variables if v]
+    if not variables:
         fig, ax = plt.subplots(figsize=(12, 5))
         ax.set_title("No Variables Selected")
         return fig, [ax], [], None
@@ -1904,7 +1904,7 @@ def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res
 
         # Figure / axes
 
-    nvars = len(vars)
+    nvars = len(variables)
 
     #if figsize is None:
     #    figsize = (14, max(4 * nvars, 5))
@@ -1930,7 +1930,7 @@ def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res
         profiles = ds.PROFILE_NUMBER.values
         cbars = []
         base_kw = kw.copy()
-        for i, var in enumerate(vars):
+        for i, var in enumerate(variables):
             ax_i = axes[i]
             values = ds[var].values
             if log_scale:
@@ -1954,7 +1954,7 @@ def plot_section(ds: xr.Dataset, vars: list = ['TEMP', 'PSAL', 'DENSITY'], v_res
 
         # plotting
             if not plot_kw.get("cmap"):
-                plot_kw["cmap"] = utilities.plotting_colormap(vars)
+                plot_kw["cmap"] = utilities.plotting_colormap(variables)
 
             if method == "contourf":
                 levels = utilities.get_contour_levels(levels=levels, log_scale=log_scale, vmin=plot_kw["vmin"], vmax=plot_kw["vmax"])
