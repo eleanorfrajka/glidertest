@@ -32,17 +32,17 @@ def test_depth_z(fresh_subset):
 
 def test_labels(fresh_subset):
     ds = fresh_subset
-    var = 'PITCH'
-    label = utilities.plotting_labels(var)
+    variable = 'PITCH'
+    label = utilities.plotting_labels(variable)
     assert label == 'PITCH'
-    colormap = utilities.plotting_colormap(var)
+    colormap = utilities.plotting_colormap(variable)
     assert colormap == cmo.delta
-    var = 'TEMP'
-    label = utilities.plotting_labels(var)
+    variable = 'TEMP'
+    label = utilities.plotting_labels(variable)
     assert label == 'Temperature'
-    unit = utilities.plotting_units(ds, var)
+    unit = utilities.plotting_units(ds, variable)
     assert unit == 'Celsius'
-    colormap = utilities.plotting_colormap(var)
+    colormap = utilities.plotting_colormap(variable)
     assert colormap == cmo.thermal
 
 
@@ -50,4 +50,4 @@ def test_bin_profile(fresh_subset):
     ds = fresh_subset
     prof_num = ds.PROFILE_NUMBER[0].values
     ds_profile = ds.where(ds.PROFILE_NUMBER == prof_num, drop=True)
-    utilities.bin_profile(ds_profile, vars=['TEMP'], binning=5)
+    utilities.bin_profile(ds_profile, variables=['TEMP'], binning=5)

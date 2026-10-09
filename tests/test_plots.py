@@ -22,14 +22,14 @@ def test_plots(fresh_subset, start_prof=0, end_prof=100):
 def test_up_down_bias(fresh_subset, v_res=1):
     ds = fresh_subset
     fig, ax = plt.subplots()
-    plots.plot_updown_bias(ds, var='PSAL', v_res=1, ax=ax)
-    df = tools.quant_updown_bias(ds, var='PSAL', v_res=v_res)
+    plots.plot_updown_bias(ds, variable='PSAL', v_res=1, ax=ax)
+    df = tools.quant_updown_bias(ds, variable='PSAL', v_res=v_res)
     lims = np.abs(df.dc)
     assert ax.get_xlim() == (-np.nanpercentile(lims, 99.5), np.nanpercentile(lims, 99.5))
     assert ax.get_ylim() == (df.depth.max() + 1, -df.depth.max() / 30)
     assert ax.get_xlabel() == f'{utilities.plotting_labels("PSAL")} ({utilities.plotting_units(ds,"PSAL")})'
     # check without passing axis
-    new_fig, new_ax = plots.plot_updown_bias(ds, var='PSAL', v_res=1)
+    new_fig, new_ax = plots.plot_updown_bias(ds, variable='PSAL', v_res=1)
     assert new_ax.get_xlim() == (-np.nanpercentile(lims, 99.5), np.nanpercentile(lims, 99.5))
     assert new_ax.get_ylim() == (df.depth.max() + 1, -df.depth.max() / 30)
     assert new_ax.get_xlabel() == f'{utilities.plotting_labels("PSAL")} ({utilities.plotting_units(ds,"PSAL")})'
@@ -37,9 +37,9 @@ def test_up_down_bias(fresh_subset, v_res=1):
 
 def test_chl(fresh_subset, var1='CHLA', var2='BBP700'):
     ds = fresh_subset
-    fig, ax = plots.process_optics_assess(ds, var=var1)
+    fig, ax = plots.process_optics_assess(ds, variable=var1)
     assert ax.get_ylabel() == f'{utilities.plotting_labels(var1)} ({utilities.plotting_units(ds,var1)})'
-    fig, ax = plots.process_optics_assess(ds, var=var2)
+    fig, ax = plots.process_optics_assess(ds, variable=var2)
     assert ax.get_ylabel() == f'{utilities.plotting_labels(var2)} ({utilities.plotting_units(ds,var2)})'
 
 
@@ -59,7 +59,7 @@ def test_daynight_avg_plot():
     ds = fetchers.load_sample_dataset()
     if "TIME" not in ds.indexes:
         ds = ds.set_xindex('TIME')
-    fig, ax = plots.plot_daynight_avg(ds, var='TEMP')
+    fig, ax = plots.plot_daynight_avg(ds, variable='TEMP')
     assert ax.get_ylabel() == 'Depth (m)'
     assert ax.get_xlabel() == f'{utilities.plotting_labels("TEMP")} ({utilities.plotting_units(ds,"TEMP")})'
 
@@ -101,26 +101,26 @@ def test_vert_vel(fresh_sg014):
     plots.plot_vertical_speeds_with_histograms(ds_sg014)
     ds_dives = ds_sg014.sel(N_MEASUREMENTS=ds_sg014.PHASE == 2)
     ds_climbs = ds_sg014.sel(N_MEASUREMENTS=ds_sg014.PHASE == 1)
-    ds_out_dives = tools.quant_binavg(ds_dives, var='VERT_CURR_MODEL', dz=10)
-    ds_out_climbs = tools.quant_binavg(ds_climbs, var='VERT_CURR_MODEL', dz=10)
+    ds_out_dives = tools.quant_binavg(ds_dives, variable='VERT_CURR_MODEL', dz=10)
+    ds_out_climbs = tools.quant_binavg(ds_climbs, variable='VERT_CURR_MODEL', dz=10)
     plots.plot_combined_velocity_profiles(ds_out_dives, ds_out_climbs)
     # extra tests for ramsey calculations of DEPTH_Z
     ds_climbs = ds_climbs.drop_vars(['DEPTH_Z'])
-    tools.quant_binavg(ds_climbs, var='VERT_CURR_MODEL', dz=10)
+    tools.quant_binavg(ds_climbs, variable='VERT_CURR_MODEL', dz=10)
     ds_climbs = ds_climbs.drop_vars(['LATITUDE'])
     with pytest.raises(KeyError):
-        tools.quant_binavg(ds_climbs, var='VERT_CURR_MODEL', dz=10)
+        tools.quant_binavg(ds_climbs, variable='VERT_CURR_MODEL', dz=10)
 
 
 def test_hyst_plot(fresh_subset, var='DOXY'):
-    fig, ax = plots.plot_hysteresis(fresh_subset, var=var, v_res=1, threshold=2, ax=None)
+    fig, ax = plots.plot_hysteresis(fresh_subset, variable=var, v_res=1, threshold=2, ax=None)
     assert ax[4].get_ylabel() == 'Depth (m)'
     assert ax[0].get_ylabel() == 'Depth (m)'
 
 
 def test_sop(fresh_subset):
     ds = fresh_subset
-    plots.plot_global_range(ds, var='DOXY', min_val=-5, max_val=600, ax=None)
+    plots.plot_global_range(ds, variable='DOXY', min_val=-5, max_val=600, ax=None)
     spike = qartod.spike_test(ds.DOXY, suspect_threshold=25, fail_threshold=50, method="average")
     plots.plot_ioosqc(spike, suspect_threshold=[25], fail_threshold=[50], title='Spike test DOXY')
     flat = qartod.flat_line_test(ds.DOXY, ds.TIME, 1, 2, 0.001)
@@ -151,8 +151,8 @@ def test_plot_CR(fresh_subset):
 
 def test_plot_section(fresh_subset):
     ds = fresh_subset
-    plots.plot_section(ds, vars=['TEMP'], start=475, end=500, method='pcolormesh')
-    plots.plot_section(ds, vars=['PSAL'], start=None, end=475, method='contourf')
+    plots.plot_section(ds, variables=['TEMP'], start=475, end=500, method='pcolormesh')
+    plots.plot_section(ds, variables=['PSAL'], start=None, end=475, method='contourf')
 
 
 def test_style_override(fresh_subset):
@@ -166,10 +166,10 @@ def test_style_override(fresh_subset):
     original = plots._ACTIVE_STYLE
     try:
         plots._ACTIVE_STYLE = override
-        fig, ax = plots.plot_updown_bias(ds, var='PSAL', v_res=1)
+        fig, ax = plots.plot_updown_bias(ds, variable='PSAL', v_res=1)
         assert fig.get_facecolor() == distinct
     finally:
         plots._ACTIVE_STYLE = original
     # Default restored: a fresh figure no longer carries the override.
-    fig, ax = plots.plot_updown_bias(ds, var='PSAL', v_res=1)
+    fig, ax = plots.plot_updown_bias(ds, variable='PSAL', v_res=1)
     assert fig.get_facecolor() != distinct

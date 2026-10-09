@@ -47,7 +47,7 @@ def section(ds: xr.Dataset, var: str) -> str | None:
     taken from the axes.
     """
     return _slots.render(
-        lambda: plots.plot_section(ds, vars=[var], method="pcolormesh")[0].get_figure(), source="plot_section", optional=True
+        lambda: plots.plot_section(ds, variables=[var], method="pcolormesh")[0].get_figure(), source="plot_section", optional=True
     )
 
 
@@ -71,17 +71,17 @@ def prof_monotony(ds: xr.Dataset) -> str | None:
 
 def hysteresis(ds: xr.Dataset, var: str, slot: str = "full") -> str | None:
     """Render the dive–climb hysteresis panel for *var*."""
-    return _slots.render(lambda: plots.plot_hysteresis(ds, var=var)[0], slot=slot, source="plot_hysteresis", optional=True)
+    return _slots.render(lambda: plots.plot_hysteresis(ds, variable=var)[0], slot=slot, source="plot_hysteresis", optional=True)
 
 
 def updown_bias(ds: xr.Dataset, var: str, slot: str = "half") -> str | None:
     """Render the up/down-cast bias panel for *var* (a narrow profile plot, half width by default)."""
-    return _slots.render(lambda: plots.plot_updown_bias(ds, var=var)[0], slot=slot, source="plot_updown_bias", optional=True)
+    return _slots.render(lambda: plots.plot_updown_bias(ds, variable=var)[0], slot=slot, source="plot_updown_bias", optional=True)
 
 
 def temporal_drift(ds: xr.Dataset, var: str, slot: str = "full") -> str | None:
     """Render the temporal-drift panel for *var*."""
-    return _slots.render(lambda: plots.check_temporal_drift(ds, var=var)[0], slot=slot, source="check_temporal_drift", optional=True)
+    return _slots.render(lambda: plots.check_temporal_drift(ds, variable=var)[0], slot=slot, source="check_temporal_drift", optional=True)
 
 
 def global_range(ds: xr.Dataset, var: str, slot: str = "half") -> str | None:
@@ -93,7 +93,7 @@ def global_range(ds: xr.Dataset, var: str, slot: str = "half") -> str | None:
     span = qc.configs.get(var, {}).get("gross_range_test", {}).get("suspect_span")
     kw = {"min_val": span[0], "max_val": span[1]} if span else {}
     return _slots.render(
-        lambda: plots.plot_global_range(ds, var=var, **kw)[0],
+        lambda: plots.plot_global_range(ds, variable=var, **kw)[0],
         slot=slot,
         source="plot_global_range",
         optional=True,
@@ -109,7 +109,7 @@ def sampling_period_var(ds: xr.Dataset, var: str, slot: str = "half") -> str | N
 
 def daynight(ds: xr.Dataset, var: str, slot: str = "half") -> str | None:
     """Render the day/night average panel for *var*."""
-    return _slots.render(lambda: plots.plot_daynight_avg(ds, var=var)[0], slot=slot, source="plot_daynight_avg", optional=True)
+    return _slots.render(lambda: plots.plot_daynight_avg(ds, variable=var)[0], slot=slot, source="plot_daynight_avg", optional=True)
 
 
 def quench(ds: xr.Dataset, var: str, slot: str = "full") -> str | None:
@@ -119,7 +119,7 @@ def quench(ds: xr.Dataset, var: str, slot: str = "full") -> str | None:
 
 def process_optics(ds: xr.Dataset, var: str, slot: str = "half") -> str | None:
     """Render the optics-assessment panel (deep drift and negatives) for *var*."""
-    return _slots.render(lambda: plots.process_optics_assess(ds, var=var)[0], slot=slot, source="process_optics_assess", optional=True)
+    return _slots.render(lambda: plots.process_optics_assess(ds, variable=var)[0], slot=slot, source="process_optics_assess", optional=True)
 
 
 # --- flight (vertical velocity) ----------------------------------------------------------------

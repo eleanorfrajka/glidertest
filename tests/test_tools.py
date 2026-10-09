@@ -16,14 +16,14 @@ def test_updown_bias(v_res=1):
     # which holds for a full mission but not a 12-profile subset that skips depths; so this runs on
     # the full sample. quant_updown_bias itself is exercised on the subset by test_plots.
     ds = fetchers.load_sample_dataset()
-    df = tools.quant_updown_bias(ds, var='PSAL', v_res=v_res)
+    df = tools.quant_updown_bias(ds, variable='PSAL', v_res=v_res)
     bins = np.unique(np.round(ds.DEPTH, 0))
     ncell = math.ceil(len(bins) / v_res)
     assert len(df) == ncell
 
 
 def test_mean_profile(fresh_subset):
-    tools.mean_profile(fresh_subset, var='TEMP', v_res=1)
+    tools.mean_profile(fresh_subset, variable='TEMP', v_res=1)
 
 
 @pytest.mark.slow
@@ -32,7 +32,7 @@ def test_daynight():
     if "TIME" not in ds.indexes:
         ds = ds.set_xindex('TIME')
 
-    dayT, nightT = tools.compute_daynight_avg(ds, sel_var='TEMP')
+    dayT, nightT = tools.compute_daynight_avg(ds, variable='TEMP')
     assert len(nightT.dat.dropna()) > 0
     assert len(dayT.dat.dropna()) > 0
 
@@ -53,26 +53,26 @@ def test_vert_vel(fresh_sg014):
 
     ds_dives = ds_sg014.sel(N_MEASUREMENTS=ds_sg014.PHASE == 2)
     ds_climbs = ds_sg014.sel(N_MEASUREMENTS=ds_sg014.PHASE == 1)
-    tools.quant_binavg(ds_dives, var='VERT_CURR_MODEL', dz=10)
+    tools.quant_binavg(ds_dives, variable='VERT_CURR_MODEL', dz=10)
 
     # extra tests for ramsey calculations of DEPTH_Z
     ds_climbs = ds_climbs.drop_vars(['DEPTH_Z'])
-    tools.quant_binavg(ds_climbs, var='VERT_CURR_MODEL', dz=10)
+    tools.quant_binavg(ds_climbs, variable='VERT_CURR_MODEL', dz=10)
     ds_climbs = ds_climbs.drop_vars(['LATITUDE'])
     with pytest.raises(KeyError):
-        tools.quant_binavg(ds_climbs, var='VERT_CURR_MODEL', dz=10)
+        tools.quant_binavg(ds_climbs, variable='VERT_CURR_MODEL', dz=10)
 
 
 def test_hyst(fresh_subset):
     ds = fresh_subset
-    df_h = tools.quant_hysteresis(ds, var='DOXY', v_res=1)
-    df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, var='DOXY', v_res=1)
+    df_h = tools.quant_hysteresis(ds, variable='DOXY', v_res=1)
+    df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, variable='DOXY', v_res=1)
     assert np.array_equal(df_h.dropna(), df.dropna())
     assert len(diff) == len(err_mean)
 
 
 def test_sop(fresh_subset):
-    tools.compute_global_range(fresh_subset, var='DOXY', min_val=-5, max_val=600)
+    tools.compute_global_range(fresh_subset, variable='DOXY', min_val=-5, max_val=600)
 
 
 def test_maxdepth(fresh_subset):

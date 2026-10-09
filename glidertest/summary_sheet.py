@@ -326,8 +326,8 @@ def create_hyst_plots(ds, path):
     """
     available_sensor, available_optics, vars_optics = optics_available_data(ds)
     for var in vars_optics:
-        df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, var=var, v_res=1)
-        fig, ax = plots.plot_hysteresis(ds, var=var)
+        df, diff, err_mean, err_range, rms = tools.compute_hyst_stat(ds, variable=var, v_res=1)
+        fig, ax = plots.plot_hysteresis(ds, variable=var)
         fig_name = f'{var}_hyst.png'
         fig.savefig(f'{path}/{fig_name}')
 
@@ -358,7 +358,7 @@ def create_drift_plots(ds, path):
     """
     available_sensor, available_optics, vars_optics = optics_available_data(ds)
     for var in vars_optics:
-        fig, ax = plots.process_optics_assess(ds, var=var)
+        fig, ax = plots.process_optics_assess(ds, variable=var)
         fig_name = f'{var}_drift.png'
         fig.savefig(f'{path}/{fig_name}')
 
@@ -522,7 +522,7 @@ def mission_report(ds, report_folder_path, report_type='General'):
         if available_sensor:
             fig_quench, ax_quench = plt.subplots(1, 2, figsize=(15, 5), gridspec_kw={'width_ratios': [3, 2]})
             plots.plot_quench_assess(ds, 'CHLA', ax=ax_quench[0], ylim=35);
-            plots.plot_daynight_avg(ds, var='CHLA', ax=ax_quench[1])
+            plots.plot_daynight_avg(ds, variable='CHLA', ax=ax_quench[1])
             create_hyst_plots(ds, report_dir)
             create_drift_plots(ds, report_dir)
             fig_quench.savefig(f'{report_dir}/quench.png')

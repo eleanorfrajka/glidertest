@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 import logging
 _log = logging.getLogger(__name__)
 
-def _check_necessary_variables(ds: xr.Dataset, vars: list):
+def _check_necessary_variables(ds: xr.Dataset, variables: list):
     """
     Checks that all of a list of variables are present in a dataset.
 
@@ -20,7 +20,7 @@ def _check_necessary_variables(ds: xr.Dataset, vars: list):
     ----------
     ds: xarray.Dataset
         Dataset that should be checked
-    vars: list
+    variables: list
         List of variables
 
     Raises
@@ -32,7 +32,7 @@ def _check_necessary_variables(ds: xr.Dataset, vars: list):
     -----
     Original Author: Callum Rollo
     """
-    missing_vars = set(vars).difference(set(ds.variables))
+    missing_vars = set(variables).difference(set(ds.variables))
     if missing_vars:
         msg = f"Required variables {list(missing_vars)} do not exist in the supplied dataset."
         raise KeyError(msg)
@@ -205,7 +205,7 @@ def construct_2dgrid(x, y, v, xi=1, yi=1, x_bin_center: bool = True, y_bin_cente
     return grid, XI, YI
 
 
-def bin_profile(ds_profile, vars, binning, agg: str = 'mean'):
+def bin_profile(ds_profile, variables, binning, agg: str = 'mean'):
     """
     Bins the data for a single profile using the construct_2dgrid function. The binning determines the depth resolution.
 
@@ -213,7 +213,7 @@ def bin_profile(ds_profile, vars, binning, agg: str = 'mean'):
     ----------
     ds_profile : xr.Dataset or pd.DataFrame
         The dataset or dataframe containing the data of one profile containing at least 'DEPTH', 'PROFILE_NUMBER' and the variables to bin.
-    vars : list
+    variables : list
         The variables to bin.
     binning : float
         The depth resolution for binning.
@@ -243,10 +243,10 @@ def bin_profile(ds_profile, vars, binning, agg: str = 'mean'):
     profile_number = profile_number[msk]
 
     # Check for short or empty input data and return empty DataFrame
-    if any(len(ds_profile[var]) <= 1 for var in vars) or len(depth) <= 1:
-        return pd.DataFrame(columns=vars + ['DEPTH', 'PROFILE_NUMBER'])
+    if any(len(ds_profile[var]) <= 1 for var in variables) or len(depth) <= 1:
+        return pd.DataFrame(columns=variables + ['DEPTH', 'PROFILE_NUMBER'])
 
-    for var in vars:
+    for var in variables:
         var_grid, prof_num_grid, depth_grid = construct_2dgrid(profile_number, depth, ds_profile[var].values[msk],
                                                                 xi=1, yi=binning, x_bin_center=False, y_bin_center=True, agg=agg)
         binned_data[var] = var_grid[0]
@@ -519,7 +519,7 @@ label_dict = {
     },
 }
 
-def plotting_labels(var: str):
+def plotting_labels(variable: str):
     """
     Retrieves the label associated with a variable from a predefined dictionary.
 
@@ -528,7 +528,7 @@ def plotting_labels(var: str):
 
     Parameters
     ----------
-    var: str
+    variable: str
         The variable (key) whose label is to be retrieved.
 
     Returns
@@ -541,13 +541,13 @@ def plotting_labels(var: str):
     -----
     Original Author: Chiara Monforte
     """
-    if var in label_dict:
-        label = f'{label_dict[var]["label"]}'
+    if variable in label_dict:
+        label = f'{label_dict[variable]["label"]}'
     else:
-        label= f'{var}'
+        label= f'{variable}'
     return label
 
-def plotting_units(ds: xr.Dataset,var: str):
+def plotting_units(ds: xr.Dataset, variable: str):
     """
     Retrieves the units associated with a variable from a dataset or a predefined dictionary.
 
@@ -559,7 +559,7 @@ def plotting_units(ds: xr.Dataset,var: str):
     ----------
     ds: xarray.Dataset
         The dataset containing the variable `var`.
-    var: str 
+    variable: str
         The variable (key) whose units are to be retrieved.
 
     Returns
@@ -573,14 +573,14 @@ def plotting_units(ds: xr.Dataset,var: str):
     Original Author: Chiara Monforte
     """
 
-    if 'units' in ds[var].attrs:
-        return ds[var].attrs['units']
-    elif var in label_dict:
-        return f'{label_dict[var]["units"]}'
+    if 'units' in ds[variable].attrs:
+        return ds[variable].attrs['units']
+    elif variable in label_dict:
+        return f'{label_dict[variable]["units"]}'
     else:
         return ""
     
-def plotting_colormap(var: str):
+def plotting_colormap(variable: str):
     """
     Retrieves the colormap associated with a variable from a predefined dictionary.
 
@@ -589,7 +589,7 @@ def plotting_colormap(var: str):
 
     Parameters
     ----------
-    var: str
+    variable: str
         The variable (key) whose colormap is to be retrieved.
 
     Returns
@@ -602,8 +602,8 @@ def plotting_colormap(var: str):
     -----
     Original Author: Till Moritz
     """
-    if var in label_dict:
-        colormap = label_dict[var]["colormap"]
+    if variable in label_dict:
+        colormap = label_dict[variable]["colormap"]
     else:
         colormap = cmo.delta
     return colormap
