@@ -533,9 +533,9 @@ def check_temporal_drift(ds: xr.Dataset, variable: str, ax: plt.Axes = None, **k
         ax[0].set(ylim=(np.nanpercentile(ds[variable], 0.01), np.nanpercentile(ds[variable], 99.99)),
                   ylabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})')
 
-        c = ax[1].scatter(ds[var], ds.DEPTH, c=mdates.date2num(ds.TIME), s=3)
-        ax[1].set(xlim=(np.nanpercentile(ds[var], 0.01), np.nanpercentile(ds[var], 99.99)), ylabel='Depth (m)',
-                  xlabel=f'{utilities.plotting_labels(var)} ({utilities.plotting_units(ds, var)})')
+        c = ax[1].scatter(ds[variable], ds.DEPTH, c=mdates.date2num(ds.TIME), s=3)
+        ax[1].set(xlim=(np.nanpercentile(ds[variable], 0.01), np.nanpercentile(ds[variable], 99.99)), ylabel='Depth (m)',
+                  xlabel=f'{utilities.plotting_labels(variable)} ({utilities.plotting_units(ds, variable)})')
         ax[1].invert_yaxis()
         [a.grid() for a in ax]
 
