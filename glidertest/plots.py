@@ -526,7 +526,7 @@ def check_temporal_drift(ds: xr.Dataset, variable: str, ax: plt.Axes = None, **k
             fig = plt.gcf()
             force_plot = False
 
-        ax[0].scatter(mdates.date2num(ds.TIME), ds[var], s=3)
+        ax[0].scatter(mdates.date2num(ds.TIME), ds[variable], s=3)
         # Set x-tick labels based on duration of the selection
         utilities._time_axis_formatter(ax[0], ds, format_x_axis=True)
 
