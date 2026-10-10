@@ -9,6 +9,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from ._manifest import validate_nav
+
 if TYPE_CHECKING:
     import xarray as xr
 
@@ -43,15 +45,22 @@ def _build_nav(pages: list[Page], current: Page, source_name: str, *, back: bool
         for key, label in _NAV_ROWS
         if (group := [p for p in pages if p.nav_group == key])
     ]
+    # Inventory pills render as .file-pill, not .nav-<role>, so their role is cosmetic — but
+    # validate_nav checks every pill's role against ROLE_ACCENT, so use a valid key ("component",
+    # as ctdcast's _navs.py does) rather than the inventory Page's own "inventory" role.
     inventory = [
-        {**pill(p), "label": source_name} for p in pages if p.nav_group == "inventory"
+        {**pill(p), "label": source_name, "role": "component"}
+        for p in pages
+        if p.nav_group == "inventory"
     ]
     back_pill = (
         {"label": "← All missions", "href": "../index.html", "role": "up", "state": "link"}
         if back
         else None
     )
-    return {"rows": rows, "back": back_pill, "inventory": inventory}
+    nav = {"rows": rows, "back": back_pill, "inventory": inventory}
+    validate_nav(nav)  # fail loudly at build time on a malformed nav (bad role/state, >1 current)
+    return nav
 
 
 def resolve_mission_id(ds: xr.Dataset | None, mission_id: str | None = None) -> str:

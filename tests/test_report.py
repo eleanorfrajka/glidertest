@@ -790,3 +790,64 @@ def test_report_warns_when_id_reused_for_different_file(tmp_path, subset_ds):
     (mdir / "report.json").write_text(json.dumps(manifest))
     with pytest.warns(UserWarning, match="metadata problem"):
         report(subset_ds, tmp_path, navigator=False)
+
+
+def test_render_panel_turns_a_raising_draw_into_a_stub_reason():
+    """A draw that raises becomes a Stub carrying "<ExcType>: <message>"; None and a figure pass through.
+
+    This is the #289 groundwork: a figure panel whose draw fails says why instead of vanishing.
+    render() keeps str|None (the navigator map relies on silent omission), so only render_panel wraps.
+    """
+    import matplotlib.pyplot as plt
+
+    from glidertest.reports._manifest import Stub
+
+    def raises():
+        raise ValueError("no TEMP in this file")
+
+    stub = _slots.render_panel(raises, source="raises")
+    assert isinstance(stub, Stub)
+    assert stub.reason == "ValueError: no TEMP in this file"
+
+    # A draw whose data is absent returns None → the panel drops silently, not a Stub.
+    assert _slots.render_panel(lambda: None, source="absent") is None
+
+    # A draw that returns a figure renders to a base64 PNG string, unchanged from render().
+    out = _slots.render_panel(lambda: plt.subplots()[0], source="fig")
+    assert isinstance(out, str) and out
+
+
+def test_build_nav_validates_and_has_one_current_pill_per_page():
+    """Every page builds a nav `validate_nav` accepts, with exactly one `current` pill.
+
+    Guards the #289/shared-nav contract: `_build_nav` calls `validate_nav` internally, so a bad
+    role/state or a second `current` pill would raise here; the count check pins the highlight.
+    """
+    from glidertest.reports import _build_nav
+    from glidertest.reports._mission import PAGES
+
+    pages = list(PAGES)
+    for current in pages:
+        nav = _build_nav(pages, current, "src.nc", back=True)  # raises via validate_nav if malformed
+        all_pills = [pill for row in nav["rows"] for pill in row["pills"]]
+        all_pills += list(nav["inventory"])
+        if nav["back"] is not None:
+            all_pills.append(nav["back"])
+        # Every pill carries an explicit state the vendored _nav.html macro renders correctly: a
+        # missing state would pass validate_nav (it defaults to "link") but the macro keys on the
+        # actual field and would emit a stateless non-link span. _build_nav must never produce one.
+        assert all("state" in pill and pill["state"] in {"link", "current"} for pill in all_pills)
+        currents = [pill for pill in all_pills if pill["state"] == "current"]
+        assert len(currents) == 1, f"{current.filename}: {len(currents)} current pills"
+
+
+def test_render_panel_stub_keeps_message_when_first_line_blank():
+    """A draw whose exception message starts with a newline keeps its text in the Stub reason."""
+    from glidertest.reports._manifest import Stub
+
+    def raises():
+        raise ValueError("\nTEMP missing on N_MEASUREMENTS")
+
+    stub = _slots.render_panel(raises, source="raises")
+    assert isinstance(stub, Stub)
+    assert stub.reason == "ValueError: TEMP missing on N_MEASUREMENTS"
