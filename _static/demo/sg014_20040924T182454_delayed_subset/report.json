@@ -41,6 +41,10 @@
       "label": "Mission"
     },
     {
+      "file": "qc.html",
+      "label": "QC"
+    },
+    {
       "file": "ctd.html",
       "label": "CTD"
     },
@@ -855,6 +859,6 @@
       63.9343
     ]
   ],
-  "glidertest_version": "0.1.dev396+gdbeffbc98",
-  "generated_at": "2026-10-12 16:26 UTC"
+  "glidertest_version": "0.1.dev400+g1bf686924",
+  "generated_at": "2026-10-13 14:25 UTC"
 }
